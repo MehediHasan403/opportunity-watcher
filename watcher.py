@@ -120,7 +120,11 @@ def check_feed(src, include, exclude) -> list[dict]:
     if feed.bozo and not feed.entries:
         raise RuntimeError(f"not a valid feed ({feed.bozo_exception})")
     items = []
+    max_age = src.get("max_age_days")
     for e in feed.entries:
+        published = e.get("published_parsed") or e.get("updated_parsed")
+        if max_age and published and now() - datetime(*published[:6], tzinfo=timezone.utc) > timedelta(days=max_age):
+            continue
         title = clean_text(e.get("title", ""))
         summary = clean_text(e.get("summary", ""))
         link = normalize_url(e.get("link", ""))
@@ -187,13 +191,11 @@ def search_sources(cfg) -> list[dict]:
     s = cfg.get("web_search", {})
     if not s.get("enabled", True):
         return []
-    window = s.get("recent_days", 30)
     out = []
     for term in s.get("terms", []):
-        q = quote_plus(f"{term} when:{window}d")
-        out.append({"name": f"Web search: {term}", "mode": "feed", "filter": s.get("filter", True),
-                    "url": f"https://news.google.com/rss/search?q={q}&hl=en-US&gl=US&ceid=US:en",
-                    "_search": True})
+        out.append({"name": f"Web search: {term}", "mode": "feed", "filter": s.get("filter", False),
+                    "max_age_days": s.get("recent_days", 30),
+                    "url": f"https://news.google.com/rss/search?q={quote_plus(term)}&hl=en&gl=DE&ceid=DE:en"})
     return out
 
 
@@ -329,6 +331,10 @@ def run(dry_run: bool) -> int:
     cfg = yaml.safe_load(CONFIG_FILE.read_text(encoding="utf-8"))
     inc = cfg.get("keywords", {}).get("include", [])
     exc = cfg.get("keywords", {}).get("exclude", []) or []
+    if not dry_run and not (os.environ.get("SMTP_USER") and os.environ.get("SMTP_PASS")):
+        print("Email is not set up yet: add the SMTP_USER and SMTP_PASS secrets (see README). "
+              "Skipping this run; nothing is saved, so your first real run still sends the full list.")
+        return 0
     state = load_state()
     first_run = not state["sources"]
     salto_items: list[dict] = []

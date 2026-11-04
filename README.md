@@ -4,7 +4,7 @@ Runs free on GitHub **every 4 hours**. It checks the **SALTO-YOUTH European Trai
 
 | What it watches | What counts as a match |
 |---|---|
-| **SALTO European Training Calendar.** Every upcoming training is opened and read. | It must be open to people living in Germany, include one of your topics (digital, AI, ICT, coding, robotics, IoT, embedded, C++, employability…), and its deadline must not have passed. |
+| **SALTO European Training Calendar.** Every upcoming training is opened and read. | It must be open to people living in Germany, and its deadline must not have passed. It must also have one of your topics (digital, AI, ICT, coding, robotics, IoT, embedded, C++, employability…) **in its title**, or at least 2 different topics in its description. |
 | **19 web searches** via Google News: BIPs in embedded/IoT/robotics, Rhine-Waal Erasmus, embedded world Student Day, C++ workshops and meetups, hackathons, digital youth-work trainings. | Any new result from the last 30 days. |
 | **University and event pages:** ISEC Coimbra BIP, Wrocław KCiR, Euclides Network, Rhine-Waal news, embedded world Student Day, Meeting C++, JUGEND für Europa. | New links with your keywords, or new text on the page. |
 
@@ -46,13 +46,21 @@ You should get an email within a minute. Check spam the first time and mark it *
 
 Optional: mode **dry-run** checks everything and shows the results in the run log (Actions → the run → *Run watcher*) without sending email.
 
+Until the secrets are added, the scheduled runs skip quietly and save nothing.
+
+### 6. Optional: Google Alerts for the whole web (10 minutes)
+The built-in web searches use Google News, which covers news sites. To also catch university pages and posters:
+1. Go to **google.com/alerts** and type a query. The six queries are written next to `PASTE_GOOGLE_ALERT_RSS_URL_1` … `_6` at the bottom of `config.yaml`.
+2. Click **Show options** and set: How often **As-it-happens**, How many **All results**, Deliver to **RSS feed**. Click **Create Alert**.
+3. Right-click the orange RSS icon next to the alert, choose **Copy link**, and paste it over the matching `PASTE_...` text in `config.yaml` (keep the quotes).
+
 ---
 
 ## Changing your requirements
 
 Edit **`config.yaml`** on GitHub (open it → pencil icon → **Commit changes**). The next run uses the new settings.
 
-- **SALTO topics:** `salto: topics:`. Add or remove words.
+- **SALTO topics:** `salto: topics:`. Add or remove words. To make matching looser or stricter, change `min_topic_matches` (1 = any mention).
 - **Only certain types:** `salto: activity_types: [Training Course, Seminar]`.
 - **Skip things:** `salto: exclude_words: [youth exchange]`.
 - **Add a web search:** add a line under `web_search: terms:`. Quotes mean an exact phrase, `OR` means either word.

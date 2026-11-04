@@ -29,6 +29,10 @@ salto:
     - all countries
     - any country
 
+  # A training matches if a topic word is in its TITLE, or at least this many
+  # different topic words appear in its description (avoids "uses digital tools" noise).
+  min_topic_matches: 2
+
   # Report trainings where SALTO doesn't say who can apply (you check yourself)
   include_unknown_eligibility: true
 
@@ -81,12 +85,14 @@ salto:
 
 # ---------------------------------------------------------------------
 # 2. Web searches - every search term from our planning, run automatically
-#    through Google News (no account or setup needed). Only results from the
-#    last `recent_days` days; each result is emailed once.
+#    through Google News (no account or setup needed). Only results published
+#    in the last `recent_days` days; each result is emailed once.
+#    Google News covers news sites. For university pages, also set up the
+#    Google Alerts at the bottom of this file (same terms, whole web).
 # ---------------------------------------------------------------------
 web_search:
   enabled: true
-  recent_days: 30
+  recent_days: 30        # ignore results older than this
   filter: false          # the search term itself is the filter
   terms:
     # Erasmus+ Blended Intensive Programmes (BIPs) in embedded / tech
@@ -197,9 +203,37 @@ sources:
     url: "https://www.jugendfuereuropa.de/veranstaltungen/europaeische-fortbildungen"
     keywords: [digital, ICT, AI, artificial intelligence, technology, coding, STEM, media, employability]
 
-  # Optional: Google Alerts (google.com/alerts -> Deliver to: RSS feed).
-  # Paste the feed link and remove the # signs to switch one on.
-  # - name: "Google Alert: BIP embedded"
-  #   mode: feed
-  #   filter: false
-  #   url: "PASTE_GOOGLE_ALERT_RSS_URL"
+  # Google Alerts - search the WHOLE web (university pages too), not just news.
+  # Optional, 10 minutes: create each alert at https://www.google.com/alerts
+  # (Show options -> How often: As-it-happens, How many: All results,
+  #  Deliver to: RSS feed), copy the RSS link and paste it over PASTE_...
+  # Entries still showing PASTE_ are skipped automatically.
+  - name: "Google Alert: BIP embedded systems"
+    mode: feed
+    filter: false
+    url: "PASTE_GOOGLE_ALERT_RSS_URL_1"   # "Blended Intensive Programme" embedded systems
+
+  - name: "Google Alert: BIP IoT / robotics"
+    mode: feed
+    filter: false
+    url: "PASTE_GOOGLE_ALERT_RSS_URL_2"   # "Blended Intensive Programme" IoT OR robotics OR microcontroller
+
+  - name: "Google Alert: BIP 2027"
+    mode: feed
+    filter: false
+    url: "PASTE_GOOGLE_ALERT_RSS_URL_3"   # "BIP" 2027 embedded OR "C++" OR ROS
+
+  - name: "Google Alert: Rhine-Waal Erasmus"
+    mode: feed
+    filter: false
+    url: "PASTE_GOOGLE_ALERT_RSS_URL_4"   # "Rhine-Waal University" OR "Hochschule Rhein-Waal" Erasmus OR BIP
+
+  - name: "Google Alert: embedded C++ workshop"
+    mode: feed
+    filter: false
+    url: "PASTE_GOOGLE_ALERT_RSS_URL_5"   # embedded "C++" workshop students Germany free
+
+  - name: "Google Alert: embedded world Student Day"
+    mode: feed
+    filter: false
+    url: "PASTE_GOOGLE_ALERT_RSS_URL_6"   # "embedded world" "Student Day" 2027

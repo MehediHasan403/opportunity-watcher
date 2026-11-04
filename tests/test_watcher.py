@@ -137,6 +137,8 @@ def sandbox(tmp_path, monkeypatch):
     monkeypatch.setattr(salto.time, "sleep", lambda s: None)
     monkeypatch.setattr(salto, "_today", lambda: TODAY)
     monkeypatch.setattr(watcher.time, "sleep", lambda s: None)
+    monkeypatch.setenv("SMTP_USER", "me@example.com")
+    monkeypatch.setenv("SMTP_PASS", "x")
     return tmp_path, sent, pages
 
 
@@ -162,3 +164,22 @@ def test_first_run_then_only_new(sandbox, monkeypatch):
     pages["ai-for-youth"] = FIX / "salto_detail_forum.html"
     watcher.run(dry_run=False)
     assert len(sent) == 2 and sent[1][0].startswith("New: 1 new SALTO training")
+
+
+def test_passing_mention_is_not_enough():
+    t = detail("ictsm")
+    t = dict(t, title="Outdoor Leadership Course",
+             description="A course on outdoor leadership for youth workers. Participants also use digital tools "
+                         "to document their hikes and reflect together in the evenings.",
+             recommended="Youth workers")
+    ok, info = salto.evaluate(t, REQ, TODAY)
+    assert not ok and "in passing" in info["reason"]
+    t["title"] = "Outdoor Leadership with Digital Storytelling"
+    assert salto.evaluate(t, REQ, TODAY)[0]
+
+
+def test_skips_quietly_until_email_is_set_up(sandbox, monkeypatch):
+    tmp, sent, _ = sandbox
+    monkeypatch.delenv("SMTP_PASS")
+    assert watcher.run(dry_run=False) == 0
+    assert not sent and not (tmp / "state.json").exists()

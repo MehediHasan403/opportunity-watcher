@@ -287,9 +287,17 @@ def evaluate(t: dict, req: dict, today: datetime | None = None) -> tuple[bool, d
         if _has(text, word):
             info["reason"] = f"excluded word {word!r}"
             return False, info
-    info["topics"] = [k for k in req.get("topics", []) if _has(text, k)]
-    if not info["topics"]:
+    hits = [k for k in req.get("topics", []) if _has(text, k)]
+    # "digital" inside "digital skills" is one idea, not two
+    distinct = [h for h in hits if not any(h.lower() != o.lower() and h.lower() in o.lower() for o in hits)]
+    in_title = [k for k in req.get("topics", []) if _has(t["title"], k)]
+    info["topics"] = hits
+    need = req.get("min_topic_matches", 2)
+    if not hits:
         info["reason"] = "no topic keyword"
+        return False, info
+    if not in_title and len(distinct) < need:
+        info["reason"] = f"only {', '.join(distinct)} mentioned in passing"
         return False, info
     return True, info
 
