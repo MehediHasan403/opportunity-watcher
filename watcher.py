@@ -116,9 +116,11 @@ def fetch(url: str) -> requests.Response:
 # ================================================================ generic sources
 
 def check_feed(src, include, exclude) -> list[dict]:
-    feed = feedparser.parse(fetch(src["url"]).content)
+    resp = fetch(src["url"])
+    feed = feedparser.parse(resp.content)
     if feed.bozo and not feed.entries:
-        raise RuntimeError(f"not a valid feed ({feed.bozo_exception})")
+        raise RuntimeError(f"not a valid feed ({feed.bozo_exception}); got {resp.text[:120]!r}")
+    src["_raw"] = len(feed.entries)
     items = []
     max_age = src.get("max_age_days")
     for e in feed.entries:
@@ -195,7 +197,7 @@ def search_sources(cfg) -> list[dict]:
     for term in s.get("terms", []):
         out.append({"name": f"Web search: {term}", "mode": "feed", "filter": s.get("filter", False),
                     "max_age_days": s.get("recent_days", 30),
-                    "url": f"https://news.google.com/rss/search?q={quote_plus(term)}&hl=en&gl=DE&ceid=DE:en"})
+                    "url": f"https://news.google.com/rss/search?q={quote_plus(term)}&hl=en-US&gl=US&ceid=US:en"})
     return out
 
 
@@ -387,12 +389,13 @@ def run(dry_run: bool) -> int:
             note_result(name, src["url"])
             # The first time a source is checked, its existing items are only remembered
             # (old news isn't news). Set report_on_first_run: true to get them anyway.
+            raw = f" (of {src['_raw']} results)" if "_raw" in src else ""
             if brand_new and not src.get("report_on_first_run", False):
-                print(f"[ok]   {name}: {found_n} matching, remembered as baseline")
+                print(f"[ok]   {name}: {found_n} matching{raw}, remembered as baseline")
                 continue
             if new_items:
                 other[name] = new_items[:MAX_ITEMS_PER_SOURCE_IN_EMAIL]
-            print(f"[ok]   {name}: {found_n} matching, {len(new_items)} new")
+            print(f"[ok]   {name}: {found_n} matching{raw}, {len(new_items)} new")
         except Exception as e:
             note_result(name, src["url"], e)
         time.sleep(0.5)
