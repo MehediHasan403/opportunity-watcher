@@ -1,0 +1,205 @@
+# =====================================================================
+#  Opportunity Watcher - YOUR REQUIREMENTS
+#  Edit this file on GitHub (pencil icon). The next run uses it.
+#  Matching is whole-word and not case sensitive.
+# =====================================================================
+
+# ---------------------------------------------------------------------
+# 1. SALTO-YOUTH European Training Calendar  (the main source)
+#    Every upcoming training is opened and checked. You get an email
+#    when a NEW one meets ALL of these rules:
+#      - open to participants living in Germany        (open_to)
+#      - at least one topic keyword in title/description (topics)
+#      - application deadline not passed
+#    Each email shows dates, deadline, who can apply and what's paid.
+# ---------------------------------------------------------------------
+salto:
+  enabled: true
+
+  # You live in Germany (residence permit), so these count as "open to you".
+  # "Programme countries" matches "Erasmus+ Youth Programme countries".
+  open_to:
+    - Germany
+    - Deutschland
+    - Programme countries
+    - EU Member States
+    - Member States of the EU
+    - EU countries
+    - European Union
+    - all countries
+    - any country
+
+  # Report trainings where SALTO doesn't say who can apply (you check yourself)
+  include_unknown_eligibility: true
+
+  # At least one of these must appear in the title, description or target group.
+  topics:
+    # digital / tech
+    - digital
+    - digitalisation
+    - digitalization
+    - digital youth work
+    - digital competences
+    - digital skills
+    - ICT
+    - AI
+    - artificial intelligence
+    - machine learning
+    - technology
+    - technologies
+    - tech
+    - coding
+    - programming
+    - software
+    - STEM
+    - robotics
+    - IoT
+    - Internet of Things
+    - embedded
+    - C++
+    - cyber
+    - cybersecurity
+    - online safety
+    - media literacy
+    - social media
+    - innovation
+    # career value
+    - employability
+    - youth employment
+
+  # Skip trainings containing any of these words (example: - youth exchange)
+  exclude_words: []
+
+  # Only these activity types. Empty = all. Options: Training Course, Seminar,
+  # Study Visit, Partnership-building Activity, E-learning, Conference
+  activity_types: []
+
+  skip_passed_deadlines: true
+  max_pages: 25          # 10 trainings per page
+  pause_seconds: 1.0     # be polite to the SALTO server
+
+
+# ---------------------------------------------------------------------
+# 2. Web searches - every search term from our planning, run automatically
+#    through Google News (no account or setup needed). Only results from the
+#    last `recent_days` days; each result is emailed once.
+# ---------------------------------------------------------------------
+web_search:
+  enabled: true
+  recent_days: 30
+  filter: false          # the search term itself is the filter
+  terms:
+    # Erasmus+ Blended Intensive Programmes (BIPs) in embedded / tech
+    - '"Blended Intensive Programme" embedded systems'
+    - '"Blended Intensive Program" embedded'
+    - '"Blended Intensive Programme" IoT OR robotics OR microcontroller'
+    - '"Blended Intensive Programme" IoT OR robotics 2027'
+    - '"Blended Intensive Programme" "C++" OR firmware OR FPGA'
+    - '"BIP" 2027 embedded OR microcontroller OR ROS'
+    - '"BIP" 2027 embedded OR "C++" OR ROS'
+    - '"Erasmus+" BIP "electrical engineering" OR "computer engineering" 2027'
+    - '"embedded systems" "summer school" 2027'
+    # Rhine-Waal University
+    - '"Hochschule Rhein-Waal" OR "Rhine-Waal University" BIP OR Erasmus'
+    - '"Rhine-Waal University" OR "Hochschule Rhein-Waal" short-term mobility'
+    # Events, workshops, meetups in Germany
+    - '"embedded world" "Student Day" 2027'
+    - 'embedded "C++" workshop students Germany free'
+    - '"ROS 2" workshop students Germany'
+    - 'hackathon embedded OR IoT students Germany 2027'
+    - '"C++ User Group" Düsseldorf OR Aachen OR Bochum OR Köln'
+    # Funded youth trainings like the SALTO ones
+    - '"training course" "digital youth work" Erasmus+ 2027'
+    - 'SALTO training course digital OR AI OR ICT 2027'
+    - '"JUGEND für Europa" digital training'
+
+
+# ---------------------------------------------------------------------
+# 3. Keywords for the web pages in section 4 (a link is reported if it
+#    contains at least one). A page can set its own `keywords:`.
+# ---------------------------------------------------------------------
+keywords:
+  include:
+    - embedded
+    - embedded systems
+    - microcontroller
+    - firmware
+    - C++
+    - RTOS
+    - FPGA
+    - STM32
+    - ESP32
+    - Arduino
+    - IoT
+    - Internet of Things
+    - robotics
+    - ROS 2
+    - ROS2
+    - mechatronics
+    - Blended Intensive Programme
+    - Blended Intensive Program
+    - BIP
+    - summer school
+    - winter school
+    - Student Day
+    - hackathon
+  exclude: []
+
+
+# ---------------------------------------------------------------------
+# 4. Web pages and feeds
+#    mode: links    -> reports new links on the page that match keywords
+#    mode: changes  -> emails you when the page's text changes (new lines shown)
+#    mode: feed     -> any RSS/Atom feed (e.g. a Google Alert set to RSS)
+#    enabled: false -> pause a source
+# ---------------------------------------------------------------------
+sources:
+
+  # Embedded-systems BIP organisers (Coimbra / Wroclaw / Euclides network)
+  - name: "ISEC Coimbra - BIP in Embedded Systems"
+    mode: changes
+    url: "https://bip.isec.pt/"
+
+  - name: "Wroclaw Tech (KCiR) - embedded / ROS BIPs"
+    mode: links
+    url: "https://kcir.pwr.edu.pl/"
+
+  - name: "Euclides Network - news"
+    mode: links
+    url: "https://euclidesnet.eu/news/"
+    keywords: [embedded, Embedded Systems, robotics, IoT, ROS, microcontroller, electronics, FPGA, C++]
+
+  - name: "Euclides Network - events"
+    mode: links
+    url: "https://euclidesnet.eu/events/"
+    keywords: [embedded, Embedded Systems, robotics, IoT, ROS, microcontroller, electronics, FPGA, C++, BIP]
+
+  # Your university
+  - name: "Rhine-Waal University - news"
+    mode: links
+    url: "https://www.hochschule-rhein-waal.de/en/about-us/press/news"
+    keywords: [Erasmus, BIP, Blended Intensive, short-term, exchange, International Office,
+               embedded, robotics, IoT, hackathon, summer school, workshop]
+
+  # Events
+  - name: "embedded world - Student Day"
+    mode: changes
+    url: "https://embedded-world.de/en/conferences-programme/student-day"
+
+  - name: "Meeting C++ - user group news"
+    mode: links
+    url: "https://meetingcpp.com/meetingcpp/news/"
+    keywords: [User Group meetings, embedded, Düsseldorf, Duesseldorf, Aachen, Bochum, Cologne, NRW]
+
+  # Germany's National Agency - European trainings (TCAs)
+  - name: "JUGEND fuer Europa - European trainings"
+    mode: links
+    url: "https://www.jugendfuereuropa.de/veranstaltungen/europaeische-fortbildungen"
+    keywords: [digital, ICT, AI, artificial intelligence, technology, coding, STEM, media, employability]
+
+  # Optional: Google Alerts (google.com/alerts -> Deliver to: RSS feed).
+  # Paste the feed link and remove the # signs to switch one on.
+  # - name: "Google Alert: BIP embedded"
+  #   mode: feed
+  #   filter: false
+  #   url: "PASTE_GOOGLE_ALERT_RSS_URL"

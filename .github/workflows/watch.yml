@@ -1,0 +1,59 @@
+name: Opportunity watcher
+
+on:
+  schedule:
+    # Every 4 hours (UTC). Berlin winter time: 01:17, 05:17, 09:17, 13:17, 17:17, 21:17
+    - cron: "17 */4 * * *"
+  workflow_dispatch:          # "Run workflow" button
+    inputs:
+      mode:
+        description: "What to do"
+        type: choice
+        options: [normal, test-email, dry-run]
+        default: normal
+
+permissions:
+  contents: write             # lets the watcher save state.json
+
+concurrency:
+  group: watcher
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run watcher
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          MODE: ${{ inputs.mode || 'normal' }}
+        run: |
+          case "$MODE" in
+            test-email) python watcher.py --test-email ;;
+            dry-run)    python watcher.py --dry-run ;;
+            *)          python watcher.py ;;
+          esac
+
+      - name: Save what has been seen
+        if: ${{ (inputs.mode || 'normal') == 'normal' }}
+        run: |
+          git config user.name  "watcher-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state.json
+          if git diff --cached --quiet; then echo "No state change"; exit 0; fi
+          git commit -m "Update seen items [skip ci]"
+          git pull --rebase --quiet
+          git push
