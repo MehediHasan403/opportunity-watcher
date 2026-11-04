@@ -183,3 +183,68 @@ def test_skips_quietly_until_email_is_set_up(sandbox, monkeypatch):
     monkeypatch.delenv("SMTP_PASS")
     assert watcher.run(dry_run=False) == 0
     assert not sent and not (tmp / "state.json").exists()
+
+
+# ---------------------------------------------------------------- email sending
+
+class _Conn:
+    """Fake SMTP connection for testing send_email without a network."""
+    log = []
+    def __init__(self, behaviour, port): self.behaviour, self.port = behaviour, port
+    def __enter__(self): return self
+    def __exit__(self, *a): return False
+    def starttls(self): _Conn.log.append(f"starttls:{self.port}")
+    def login(self, u, p):
+        _Conn.log.append(f"login:{self.port}:{u}:{p}")
+        if self.behaviour.get(self.port) == "disconnect":
+            raise watcher.smtplib.SMTPServerDisconnected("Connection unexpectedly closed")
+        if self.behaviour.get(self.port) == "badpass":
+            raise watcher.smtplib.SMTPAuthenticationError(535, b"Username and Password not accepted")
+    def send_message(self, m): _Conn.log.append(f"sent:{self.port}")
+
+
+def _fake_smtp(monkeypatch, behaviour):
+    _Conn.log = []
+    monkeypatch.setattr(watcher.smtplib, "SMTP_SSL", lambda h, p, timeout: _Conn(behaviour, p))
+    monkeypatch.setattr(watcher.smtplib, "SMTP", lambda h, p, timeout: _Conn(behaviour, p))
+    monkeypatch.delenv("SMTP_PORT", raising=False)
+
+
+def test_email_cleans_pasted_secrets(monkeypatch):
+    _fake_smtp(monkeypatch, {})
+    monkeypatch.setenv("SMTP_USER", " me@gmail.com\n")
+    monkeypatch.setenv("SMTP_PASS", "abcd efgh\u00a0ijkl\u200bmnop\r\n")
+    watcher.send_email("s", "t", "<p>h</p>")
+    assert "login:465:me@gmail.com:abcdefghijklmnop" in _Conn.log and "sent:465" in _Conn.log
+
+
+def test_email_falls_back_to_port_587_when_465_disconnects(monkeypatch):
+    _fake_smtp(monkeypatch, {465: "disconnect"})
+    monkeypatch.setenv("SMTP_USER", "me@gmail.com")
+    monkeypatch.setenv("SMTP_PASS", "abcdefghijklmnop")
+    watcher.send_email("s", "t", "<p>h</p>")
+    assert _Conn.log[-1] == "sent:587" and "starttls:587" in _Conn.log
+
+
+def test_email_wrong_password_gives_clear_message(monkeypatch):
+    _fake_smtp(monkeypatch, {465: "badpass"})
+    monkeypatch.setenv("SMTP_USER", "me@gmail.com")
+    monkeypatch.setenv("SMTP_PASS", "wrongwrongwrong1")
+    with pytest.raises(SystemExit, match="App Password"):
+        watcher.send_email("s", "t", "<p>h</p>")
+
+
+def test_email_user_without_at_sign(monkeypatch):
+    _fake_smtp(monkeypatch, {})
+    monkeypatch.setenv("SMTP_USER", "just.a.name")
+    monkeypatch.setenv("SMTP_PASS", "abcdefghijklmnop")
+    with pytest.raises(SystemExit, match="FULL Gmail address"):
+        watcher.send_email("s", "t", "<p>h</p>")
+
+
+def test_email_both_ports_fail(monkeypatch):
+    _fake_smtp(monkeypatch, {465: "disconnect", 587: "disconnect"})
+    monkeypatch.setenv("SMTP_USER", "me@gmail.com")
+    monkeypatch.setenv("SMTP_PASS", "abcdefghijklmnop")
+    with pytest.raises(SystemExit, match="Critical security alert"):
+        watcher.send_email("s", "t", "<p>h</p>")

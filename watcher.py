@@ -293,25 +293,64 @@ def build_email(salto_items, other, problems, first_run) -> tuple[str, str, str]
             "<div style='font-family:Arial,sans-serif;max-width:680px'>" + "".join(h_parts) + "</div>")
 
 
+def _clean_secret(value: str | None) -> str:
+    """Remove every kind of whitespace, including the invisible kinds that sneak in
+    when copying and pasting (newline, tab, non-breaking space, zero-width space)."""
+    return re.sub(r"[\s\u00a0\u200b\u200c\u200d\ufeff]+", "", value or "")
+
+
 def send_email(subject: str, text: str, html_body: str) -> None:
-    user, password = os.environ.get("SMTP_USER"), os.environ.get("SMTP_PASS")
-    to = os.environ.get("EMAIL_TO") or user
-    host, port = os.environ.get("SMTP_HOST", "smtp.gmail.com"), int(os.environ.get("SMTP_PORT", "465"))
+    user = _clean_secret(os.environ.get("SMTP_USER"))
+    password = _clean_secret(os.environ.get("SMTP_PASS"))
+    to = _clean_secret(os.environ.get("EMAIL_TO")) or user
+    host = os.environ.get("SMTP_HOST", "smtp.gmail.com").strip()
     if not user or not password:
         raise SystemExit("SMTP_USER / SMTP_PASS are not set. Add them as GitHub Secrets.")
+    if "@" not in user:
+        raise SystemExit(f"SMTP_USER must be your FULL Gmail address (name@gmail.com). "
+                         f"The saved value is {len(user)} characters long and has no '@'.")
+    # Safe facts only (never the secret itself) to make a failed run easy to diagnose.
+    print(f"Email login check: user has {len(user)} characters, App Password has {len(password)} "
+          f"characters, recipient has {len(to)} characters.")
+    if host.endswith("gmail.com") and len(password) != 16:
+        print(f"WARNING: a Gmail App Password has exactly 16 letters but SMTP_PASS has {len(password)}. "
+              "It is probably not an App Password (a normal Google password cannot be used).")
+
     msg = EmailMessage()
     msg["Subject"], msg["From"], msg["To"] = subject, f"Opportunity Watcher <{user}>", to
     msg.set_content(text)
     msg.add_alternative(html_body, subtype="html")
-    if port == 465:
-        with smtplib.SMTP_SSL(host, port, timeout=30) as s:
-            s.login(user, password.replace(" ", ""))
-            s.send_message(msg)
-    else:
-        with smtplib.SMTP(host, port, timeout=30) as s:
-            s.starttls()
-            s.login(user, password.replace(" ", ""))
-            s.send_message(msg)
+
+    configured = os.environ.get("SMTP_PORT")
+    attempts = [int(configured)] if configured else [465, 587]
+    failures = []
+    for port in attempts:
+        try:
+            if port == 465:
+                conn = smtplib.SMTP_SSL(host, port, timeout=30)
+            else:
+                conn = smtplib.SMTP(host, port, timeout=30)
+            with conn as s:
+                if port != 465:
+                    s.starttls()
+                s.login(user, password)
+                s.send_message(msg)
+            print(f"Email delivered through {host}:{port}.")
+            return
+        except smtplib.SMTPAuthenticationError as e:
+            raise SystemExit(
+                f"Gmail rejected the login (port {port}): {e.smtp_code} {e.smtp_error!r}.\n"
+                "Fix: make sure SMTP_PASS is a 16-letter App Password from myaccount.google.com/apppasswords "
+                "(not your normal password) and SMTP_USER is the same Google account.")
+        except (smtplib.SMTPException, OSError) as e:
+            failures.append(f"port {port}: {type(e).__name__}: {e}")
+            print(f"Attempt on port {port} failed: {type(e).__name__}: {e}")
+    raise SystemExit(
+        "Could not send the email. Tried " + "; ".join(failures) + ".\n"
+        "Most likely causes: the App Password was revoked or copied wrongly, or Google blocked the "
+        "sign-in from GitHub's servers. Check your Google account inbox for a 'Critical security "
+        "alert' or 'Sign-in attempt blocked' email and click 'Yes, it was me'. "
+        "Then create a NEW App Password and update the SMTP_PASS secret.")
 
 
 # ================================================================ main
