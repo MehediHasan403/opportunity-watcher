@@ -608,7 +608,9 @@
   },
   "Web search: hackathon embedded OR IoT students Germany 2027": {
    "fails": 0,
-   "seen": []
+   "seen": [
+    "229bd1a0cfdc8413"
+   ]
   },
   "Wroclaw Tech (KCiR) - embedded / ROS BIPs": {
    "fails": 0,
