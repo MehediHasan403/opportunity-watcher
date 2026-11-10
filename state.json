@@ -2,7 +2,7 @@
  "heartbeat": "2026-11-04T16:25:07+00:00",
  "sources": {
   "Euclides Network - events": {
-   "fails": 0,
+   "fails": 1,
    "seen": [
     "a5958adf8adb39e8",
     "09d6e77c8635c477",
@@ -37,7 +37,7 @@
    ]
   },
   "Euclides Network - news": {
-   "fails": 0,
+   "fails": 1,
    "seen": []
   },
   "ISEC Coimbra - BIP in Embedded Systems": {
@@ -544,7 +544,20 @@
     "15525",
     "15521",
     "15526",
-    "15423"
+    "15423",
+    "15530",
+    "15538",
+    "15537",
+    "15533",
+    "15528",
+    "15543",
+    "15524",
+    "15540",
+    "15534",
+    "15541",
+    "15542",
+    "15536",
+    "15503"
    ]
   },
   "Web search: \"BIP\" 2027 embedded OR \"C++\" OR ROS": {
