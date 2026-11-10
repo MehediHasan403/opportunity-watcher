@@ -605,7 +605,9 @@
   },
   "Web search: \"embedded world\" \"Student Day\" 2027": {
    "fails": 0,
-   "seen": []
+   "seen": [
+    "f805ded4a9d305e7"
+   ]
   },
   "Web search: \"training course\" \"digital youth work\" Erasmus+ 2027": {
    "fails": 0,
