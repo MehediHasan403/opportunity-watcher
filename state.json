@@ -2,7 +2,7 @@
  "heartbeat": "2026-11-04T16:25:07+00:00",
  "sources": {
   "Euclides Network - events": {
-   "fails": 1,
+   "fails": 0,
    "seen": [
     "a5958adf8adb39e8",
     "09d6e77c8635c477",
@@ -33,11 +33,15 @@
     "63eeedaddef14a33",
     "9e52c6fba1be9c19",
     "43dfcdfeae6f051d",
-    "ccddd017874e782b"
+    "ccddd017874e782b",
+    "0248792518e9e6f0",
+    "d658567c20d29e68",
+    "3c24ced27c8006f8",
+    "d8f7c67c1524c77f"
    ]
   },
   "Euclides Network - news": {
-   "fails": 1,
+   "fails": 0,
    "seen": []
   },
   "ISEC Coimbra - BIP in Embedded Systems": {
