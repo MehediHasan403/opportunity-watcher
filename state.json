@@ -561,7 +561,8 @@
     "15541",
     "15542",
     "15536",
-    "15503"
+    "15503",
+    "15539"
    ]
   },
   "Web search: \"BIP\" 2027 embedded OR \"C++\" OR ROS": {
@@ -651,7 +652,7 @@
   },
   "embedded world - Student Day": {
    "fails": 0,
-   "hash": "ee70830d827e520aa6b3737d723166024f43001137948f8f38764da6358c6129",
+   "hash": "4b16fc5c43dd151071dd0df1dace04208ca057cd938d752c4ed08e995564dff3",
    "lines": [
     "Student Day | embedded world",
     "skip navigation",
@@ -671,15 +672,11 @@
     "Programme",
     "Buy ticket",
     "Welcome to Student Day – Your Entry into the Embedded World!",
-    "Are you studying computer science, electrical engineering, mechatronics or a related field and eager to dive into the world of",
-    "embedded system technologies",
-    "? Then the",
-    "Student Day at embedded world",
-    "is exactly the right place for you!",
+    "Are you studying computer science, electrical engineering, mechatronics or a related field and eager to dive into the world of embedded system technologies? Then the Student Day at embedded world is exactly the right place for you!",
     "Here, you will gain exclusive insights into the future of the embedded industry, establish your first contacts with leading companies, and discover exciting career opportunities – all on site at the key meeting point for the embedded community.",
     "Perfect for students who want to plan their career paths, build industry connections or get a first taste of the trade fair experience.",
-    "Follow us for current insights and special offers for students:",
-    "Instagram @embedded_next_gen",
+    "Follow us for current insights and special offers for students: Instagram",
+    "@embedded_next_gen",
     "Programme – Your Day at embedded world",
     "Look forward to an inspiring morning programme and plenty of ideas for how to spend your afternoon. The programme for Student Day at embedded world 2027 will be available here for November.",
     "Impressions from Student Day 2026",
