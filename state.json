@@ -2,7 +2,7 @@
  "heartbeat": "2026-11-11T22:42:27+00:00",
  "sources": {
   "Euclides Network - events": {
-   "fails": 1,
+   "fails": 0,
    "seen": [
     "a5958adf8adb39e8",
     "09d6e77c8635c477",
@@ -41,7 +41,7 @@
    ]
   },
   "Euclides Network - news": {
-   "fails": 1,
+   "fails": 0,
    "seen": []
   },
   "ISEC Coimbra - BIP in Embedded Systems": {
@@ -564,7 +564,14 @@
     "15536",
     "15503",
     "15539",
-    "15216"
+    "15216",
+    "15531",
+    "15548",
+    "15546",
+    "15529",
+    "15545",
+    "15555",
+    "15551"
    ]
   },
   "Web search: \"BIP\" 2027 embedded OR \"C++\" OR ROS": {
@@ -645,7 +652,8 @@
    "fails": 0,
    "seen": [
     "229bd1a0cfdc8413",
-    "54f9da17f77eaa0d"
+    "54f9da17f77eaa0d",
+    "70f0102201b40299"
    ]
   },
   "Wroclaw Tech (KCiR) - embedded / ROS BIPs": {
