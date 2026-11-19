@@ -581,7 +581,11 @@
     "15557",
     "15560",
     "15550",
-    "15564"
+    "15564",
+    "15565",
+    "15562",
+    "15559",
+    "15563"
    ]
   },
   "Web search: \"BIP\" 2027 embedded OR \"C++\" OR ROS": {
@@ -652,7 +656,9 @@
   },
   "Web search: SALTO training course digital OR AI OR ICT 2027": {
    "fails": 0,
-   "seen": []
+   "seen": [
+    "cba694d6af9ac547"
+   ]
   },
   "Web search: embedded \"C++\" workshop students Germany free": {
    "fails": 0,
