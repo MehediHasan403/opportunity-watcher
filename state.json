@@ -2,7 +2,7 @@
  "heartbeat": "2026-11-19T01:53:14+00:00",
  "sources": {
   "Euclides Network - events": {
-   "fails": 0,
+   "fails": 1,
    "seen": [
     "a5958adf8adb39e8",
     "09d6e77c8635c477",
@@ -43,7 +43,7 @@
    ]
   },
   "Euclides Network - news": {
-   "fails": 0,
+   "fails": 1,
    "seen": []
   },
   "ISEC Coimbra - BIP in Embedded Systems": {
@@ -649,7 +649,9 @@
   },
   "Web search: \"embedded systems\" \"summer school\" 2027": {
    "fails": 0,
-   "seen": []
+   "seen": [
+    "dace5839d7c1e899"
+   ]
   },
   "Web search: \"embedded world\" \"Student Day\" 2027": {
    "fails": 0,
