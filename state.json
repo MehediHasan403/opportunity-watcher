@@ -455,7 +455,9 @@
    "fails": 0,
    "seen": [
     "77d95b672e0483fb",
-    "8b759c14cfaeeca4"
+    "8b759c14cfaeeca4",
+    "fc894ce1204c0316",
+    "ca952db7cfa85e85"
    ]
   },
   "Meeting C++ - user group news": {
@@ -599,7 +601,8 @@
     "15589",
     "15586",
     "15583",
-    "15588"
+    "15588",
+    "15598"
    ]
   },
   "Web search: \"BIP\" 2027 embedded OR \"C++\" OR ROS": {
@@ -673,7 +676,8 @@
   "Web search: SALTO training course digital OR AI OR ICT 2027": {
    "fails": 0,
    "seen": [
-    "cba694d6af9ac547"
+    "cba694d6af9ac547",
+    "648bae6a3ec696f5"
    ]
   },
   "Web search: embedded \"C++\" workshop students Germany free": {
